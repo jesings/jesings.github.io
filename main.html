@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf8" />
+	<title>ML Blog post</title>
+</head>
+<body style='width:40%;padding-left: 30%; display: block;text-align: justify;'>
+<h1 class="unnumbered" id="why-perceptrons">Why perceptrons?</h1>
+<p>Any machine learning algorithm must follow the general purpose recipe
+for machine learning, as this recipe defines the process by which a
+machine learning model can converge to being an accurate model for the
+problem (i.e. an accurate classifier). The recipe is as follows:</p>
+<ol>
+<li><p>Collect a dataset</p></li>
+<li><p>Choose a decision function</p></li>
+<li><p>Construct a loss function</p></li>
+<li><p>Define goal (based on loss function)</p></li>
+<li><p>Optimize our guessing to minimize the cost function</p></li>
+</ol>
+<p>For the specific case of perceptrons, we have chosen the following
+inputs to our recipe</p>
+<ol>
+<li><p>Collect a dataset</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5C%7Bx%5Ei%2C%20y%5Ei%5C%7D_%7Bi%3D1%7D%5EN"
+alt="\{x^i, y^i\}_{i=1}^N" title="\{x^i, y^i\}_{i=1}^N"
+class="math display" /></p></li>
+<li><p>Choose a decision function</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Chat%7By%7D%20%3D%20f_%5Ctheta%28x%29"
+alt="\hat{y} = f_\theta(x)" title="\hat{y} = f_\theta(x)"
+class="math display" /></p></li>
+<li><p>Construct a loss function</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20l%28%5Chat%20%7By%7D%5Ei%2C%20y%5Ei%29"
+alt="l(\hat {y}^i, y^i)" title="l(\hat {y}^i, y^i)"
+class="math display" /></p></li>
+<li><p>Define goal:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctheta%5E%2A%20%3D%20%5Carg%20%5Cmin_%5Ctheta%20%5CSigma_%7Bi%20%3D%201%7D%5EN%20l%28f_%5Ctheta%28x%5Ei%29%2C%20y_i%29"
+alt="\theta^* = \arg \min_\theta \Sigma_{i = 1}^N l(f_\theta(x^i), y_i)"
+title="\theta^* = \arg \min_\theta \Sigma_{i = 1}^N l(f_\theta(x^i), y_i)"
+class="math display" /></p></li>
+<li><p>Optimize our guessing to minimize the cost function: Train with
+stochastic gradient descent!</p></li>
+</ol>
+<h1 class="unnumbered" id="what-are-the-problems-with-perceptrons">What
+are the problems with perceptrons?</h1>
+<p>Previously we had that at each node,</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Csigma%28%5CSigma_%7Bi%20%3D%200%7D%5Em%20x_iw_%3Ai%29%20-%20%5Csigma%28x%5E%5Ctop%20w%29%20-%20%5Chat%7By%7D"
+alt="\sigma(\Sigma_{i = 0}^m x_iw_:i) - \sigma(x^\top w) - \hat{y}"
+title="\sigma(\Sigma_{i = 0}^m x_iw_:i) - \sigma(x^\top w) - \hat{y}"
+class="math display" /></p>
+<p>where <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Csigma%28x%29%20%3D%200"
+alt="\sigma(x) = 0" title="\sigma(x) = 0" class="math inline" /> if <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20z%20%5Cleq%200"
+alt="z \leq 0" title="z \leq 0" class="math inline" /> or 1 if <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20x%20%5Cgeq%200"
+alt="x \geq 0" title="x \geq 0" class="math inline" /></p>
+<p>Obviously this activation function is non-differentiable with a huge
+jump continuity at <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20x%20%3D%200"
+alt="x = 0" title="x = 0" class="math inline" />. This makes it very
+difficult for us to apply gradient descent, and thus hampers our ability
+to actually optimize classical perceptrons with mathematical
+techniques.</p>
+<p>We want to change the perceptrons for us to be able to turn them into
+a format that can be handled by standard optimization techniques. We can
+still model each node (which is supposed to resemble a neuron in the
+human brain) as having some number of inputs and summing those up to
+produce an output but that output need not follow an activation
+function.</p>
+<p>We can try to redefine our previous version of perceptrons:</p>
+<p>Initially we can start off our perceptron with the following:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BLet%20%7DD%20%5Cequiv%20%5C%7Bx%5Ei%2C%20y%5Ei%5C%7D_%7Bi%20%3D%201%7D%5EN"
+alt="\text{Let }D \equiv \{x^i, y^i\}_{i = 1}^N"
+title="\text{Let }D \equiv \{x^i, y^i\}_{i = 1}^N"
+class="math display" /></p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cvec%7Bw%7D%5E0%20%3D%200%5Ed"
+alt="\vec{w}^0 = 0^d" title="\vec{w}^0 = 0^d"
+class="math display" /></p>
+<p>For every training epoch, every <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%28x%5Ei%2C%20y%5Ei%29%20%5Cin%20D"
+alt="(x^i, y^i) \in D" title="(x^i, y^i) \in D"
+class="math inline" />:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Chat%7By%7D%5Ei%20%3D%20%5Csigma%28%5Cvec%7Bw%7D%5E%5Ctop%20x%5Ei%29"
+alt="\hat{y}^i = \sigma(\vec{w}^\top x^i)"
+title="\hat{y}^i = \sigma(\vec{w}^\top x^i)" class="math display" /></p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20e%20%3D%20%28y%5Ei%20-%20%5Chat%7By%7D%5Ei%29"
+alt="e = (y^i - \hat{y}^i)" title="e = (y^i - \hat{y}^i)"
+class="math display" /></p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cvec%7Bw%7D%5E%7Bi%20%2B%201%7D%20%5Cgets%20%5Cvec%7Bw%7D%5Ei%20%2B%20e%20%5Ctimes%20x%5Ei"
+alt="\vec{w}^{i + 1} \gets \vec{w}^i + e \times x^i"
+title="\vec{w}^{i + 1} \gets \vec{w}^i + e \times x^i"
+class="math display" /></p>
+<p>However, we still need to figure out a choice of <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Csigma"
+alt="\sigma" title="\sigma" class="math inline" /> to make the function
+defined by our perceptron differentiable.</p>
+<p>Previously we were using an activation function: <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20y%20%3D%20%5Ctext%7Bsign%7D%28%5Cvec%7Bw%7D%5ET%20x%29"
+alt="y = \text{sign}(\vec{w}^T x)" title="y = \text{sign}(\vec{w}^T x)"
+class="math inline" />. As mentioned numerous times before this is not
+differentiable.</p>
+<p>Another big issue is that there are no nonlinear boundaries possible
+with classical perceptrons; perceptrons don’t converge when classes are
+linearly nonseparable. Consider the function <img
+style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Ctext%7Bsign%7D%28x%20%2A%20y%29"
+alt="\text{sign}(x * y)" title="\text{sign}(x * y)"
+class="math inline" />. As no single line can separate all of the values
+in 2 diagonally adjacent quadrants from all of the values in the other 2
+quadrants, we have a fundamental issue in the flexibility of
+perceptrons.</p>
+<h1 class="unnumbered" id="how-do-we-fix-perceptrons">How do we fix
+perceptrons?</h1>
+<p>In order to make these perceptrons differentiable and thus
+optimizable, we need to find some function that is differentiable but
+increasing and defined on a bounded domain. Looking back on simpler
+machine learning techniques, we already had such a function with our
+logistic regression classifier! We take our logistic regression
+classifier function and use that to determine the output of a node given
+its inputs:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y%20%3D%20%5Cfrac%7B1%7D%7B1%20%2B%20e%5E%7B-%5Cvec%7Bw%7D%5E%5Ctop%20x%7D%7D"
+alt="y = \frac{1}{1 + e^{-\vec{w}^\top x}}"
+title="y = \frac{1}{1 + e^{-\vec{w}^\top x}}"
+class="math display" /></p>
+<p>Our full definition of our new and improved differentiable
+perceptrons can thus be:</p>
+<p>Input data:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20X%20%5Cin%20%5Cmathbb%7BR%7D%5E%7Bd%20%5Ctimes%20n%7D"
+alt="X \in \mathbb{R}^{d \times n}"
+title="X \in \mathbb{R}^{d \times n}" class="math display" /></p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20Y%20%5Cin%20%5C%7B0%2C%201%5C%7D%5En"
+alt="Y \in \{0, 1\}^n" title="Y \in \{0, 1\}^n"
+class="math display" /></p>
+<p>where</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%28%5Cvec%7Bx%7D%20%5Cin%20%5Cmathbb%7BR%7D%5Ed%2C%20y%5Cin%20%5C%7B0%2C%201%5C%7D%29"
+alt="(\vec{x} \in \mathbb{R}^d, y\in \{0, 1\})"
+title="(\vec{x} \in \mathbb{R}^d, y\in \{0, 1\})"
+class="math display" /></p>
+<p>corresponds to a data point</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20p%28y%20%3D%201%7Cx%29%20%3D%20%5Cfrac%7B1%7D%7B1%20%2B%20e%5E%7B-%5Cvec%7Bw%7D%5E%5Ctop%20x%7D%7D"
+alt="p(y = 1|x) = \frac{1}{1 + e^{-\vec{w}^\top x}}"
+title="p(y = 1|x) = \frac{1}{1 + e^{-\vec{w}^\top x}}"
+class="math display" /></p>
+<p>With an objective function of</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Carg%20%5Cmin_%7B%5Cvec%7Bw%7D%7D%20L%28%5Cvec%7Bw%7D%3B%20D%29"
+alt="\arg \min_{\vec{w}} L(\vec{w}; D)"
+title="\arg \min_{\vec{w}} L(\vec{w}; D)" class="math display" /></p>
+<h1 class="unnumbered" id="what-to-do-with-this-information">What to do
+with this information</h1>
+<p>We can solve this new version of a perceptron by using a technique
+such as stochastic gradient descent, thus allowing us to get a very good
+approximator for clasification problems</p>
+<p>Relatedly, for logistic regresion with gradients: loss is negative
+log likelihood of the probability that our perceptron classifies our
+data correctly.</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y%5Ei%20%3D%201%2C%20l%28x%5Ei%2C%20y%5Ei%29%20%3D%20-%5Cln%28p%5Ei%29"
+alt="y^i = 1, l(x^i, y^i) = -\ln(p^i)"
+title="y^i = 1, l(x^i, y^i) = -\ln(p^i)" class="math display" /></p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y%5Ei%20%3D%200%2C%20l%28x%5Ei%2C%20y%5Ei%29%20%3D%20-%5Cln%281%20-%20p%5Ei%29"
+alt="y^i = 0, l(x^i, y^i) = -\ln(1 - p^i)"
+title="y^i = 0, l(x^i, y^i) = -\ln(1 - p^i)" class="math display" /></p>
+<p>So we can unify these into one function:</p>
+<p><img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20l%28x%5Ei%2C%20y%5Ei%29%20%3D%20-y%5Ei%20%5Cln%28p%5Ei%29%20-%20%281%20-%20y%5Ei%29%5Cln%281%20-%20p%5Ei%29"
+alt="l(x^i, y^i) = -y^i \ln(p^i) - (1 - y^i)\ln(1 - p^i)"
+title="l(x^i, y^i) = -y^i \ln(p^i) - (1 - y^i)\ln(1 - p^i)"
+class="math display" /></p>
+<p>We can try to apply this to data like the standard handwritten digits
+dataset.</p>
+<h1 class="unnumbered" id="problems-that-remain">Problems that
+remain</h1>
+<p>We still haven’t really fixed the linear separability issue. We also
+still have a very wasteful way of calculating information: the
+brightness values of every single pixel in a large image will result in
+a huge number of inputs that we need to feed into a perceptron making
+stochastic gradient descent here likely prohibitively costly. Thus, we
+want to find some way to condense the information we feed into the
+perceptron into a small set of relevant, information dense inputs. We
+call these inputs features.</p>
+<p>In other words we can have many inputs which aren’t individually
+descriptive, so we may end up "featurizing" the input to use as input to
+train the perceptron. However, this process of "featurizing" can itself
+become a machine learning problem: how do we choose and define
+features?</p>
+<p>We could potentially choose features through a perceptron! This is
+akin to hooking one perceptron with n inputs and m outputs into a
+perceptron with m inputs and <img style="vertical-align:middle"
+src="https://latex.codecogs.com/png.latex?%5Ctextstyle%20%5Cell"
+alt="\ell" title="\ell" class="math inline" /> outputs. We connect each
+"neuron" in the first layer of this fused perceptron, or "neural
+network" to each "neuron" in the second layer of the fused perceptron
+with a weight. This allows for a very expressive, efficient, and flexible
+machine learning framework which will be explained further in later
+lectures!</p>
+</body>
